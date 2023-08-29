@@ -17,6 +17,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @SessionAttributes("name")
 public class TodoController {
+
     private TodoService todoService;
     @RequestMapping("list-todos")
     public String listAllTodos(ModelMap map) {
@@ -37,7 +38,30 @@ public class TodoController {
             return "todo";
         }
         String name = (String) map.get("name");
-        todoService.addTodo(name, todo.getDescription() ,LocalDate.now().plusYears(1), false);
+        todoService.addTodo(name, todo.getDescription() ,todo.getTargetDate(), false);
+        return "redirect:list-todos";
+    }
+
+    @RequestMapping("delete-todo")
+    public String deleteTodo(@RequestParam int id) {
+        todoService.deleteById(id);
+        return "redirect:list-todos";
+    }
+
+    @RequestMapping(value = "update-todo", method = RequestMethod.GET)
+    public String updateTodoPage(@RequestParam int id, ModelMap map) {
+        Todo todo = todoService.findById(id);
+        map.put("todo", todo);
+        return "todo";
+    }
+
+    @RequestMapping(value = "update-todo", method = RequestMethod.POST)
+    public String updateTodo(ModelMap map, @Valid Todo todo, BindingResult result) {
+        if (result.hasErrors()) {
+            return "todo";
+        }
+        todo.setUsername((String) map.get("name"));
+        todoService.updateTodo(todo);
         return "redirect:list-todos";
     }
 }
