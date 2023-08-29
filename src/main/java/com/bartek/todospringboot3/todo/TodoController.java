@@ -1,9 +1,11 @@
 package com.bartek.todospringboot3.todo;
 
 import com.bartek.todospringboot3.service.TodoService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,14 +25,19 @@ public class TodoController {
     }
 
     @RequestMapping(value = "add-todo", method = RequestMethod.GET)
-    public String showNewTodoPAge() {
+    public String showNewTodoPAge(ModelMap map) {
+        Todo todo = new Todo(0, (String) map.get("name"), "", LocalDate.now().plusYears(1), false);
+        map.put("todo", todo);
         return "todo";
     }
 
     @RequestMapping(value = "add-todo", method = RequestMethod.POST)
-    public String addNewTodo(@RequestParam String description, ModelMap map) {
+    public String addNewTodo(ModelMap map, @Valid Todo todo, BindingResult result) {
+        if (result.hasErrors()) {
+            return "todo";
+        }
         String name = (String) map.get("name");
-        todoService.addTodo(name,description ,LocalDate.now().plusYears(1), false);
+        todoService.addTodo(name, todo.getDescription() ,LocalDate.now().plusYears(1), false);
         return "redirect:list-todos";
     }
 }
