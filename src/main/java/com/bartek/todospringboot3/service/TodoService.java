@@ -7,12 +7,13 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Service
 public class TodoService {
     private static final List<Todo> todos;
 
-    private static int todosCount = 0 ;
+    private static int todosCount = 0;
 
     static {
         todos = new ArrayList<>();
@@ -22,7 +23,9 @@ public class TodoService {
     }
 
     public List<Todo> findByUsername(String username) {
-        return todos;
+        return todos.stream()
+                .filter(t -> t.getUsername().equalsIgnoreCase(username))
+                .collect(Collectors.toList());
     }
 
     public void addTodo(String username, String description, LocalDate targetDate, boolean done) {
